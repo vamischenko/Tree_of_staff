@@ -1,5 +1,6 @@
 package ru.hse.bi1.tree.model;
 
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -15,14 +16,14 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
-import ru.hse.bi1.tree.forms.AdditionalForm;
 import ru.hse.bi1.tree.forms.MainForm;
 
 public class Model extends DefaultTreeModel {
 
 	private static final long serialVersionUID = 1L;
 
-	public static String alphabet = new String("ABCDEFGIJKLMNOPRSTUVWXYZ");
+	/** Префиксы тем для дерева: полный латинский алфавит A–Z. */
+	public static final String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 	private static DefaultMutableTreeNode root;
 
@@ -108,8 +109,9 @@ public class Model extends DefaultTreeModel {
 			}
 			DictionaryElem elem = (DictionaryElem) node.getUserObject();
 			if ("Topic".equals(elem.getType())) {
-				if (new_entry.getValue().substring(0, elem.getValue().toString().length())
-						.equalsIgnoreCase(elem.getValue())) {
+				String prefix = elem.getValue().toString();
+				String val = new_entry.getValue();
+				if (val.length() >= prefix.length() && val.substring(0, prefix.length()).equalsIgnoreCase(prefix)) {
 					anchor.topic = node;
 					break;
 				}
@@ -153,93 +155,47 @@ public class Model extends DefaultTreeModel {
 
 	public void fireDataChange() {
 		reload();
-		MainForm.getInstance().seacher.reset((DefaultMutableTreeNode) getRoot());
+		MainForm.getInstance().searcher.reset((DefaultMutableTreeNode) getRoot());
 	}
 
 	public void readFile(File in) {
-		final AdditionalForm form = null;
-		FileInputStream fis = null;
-		ObjectInputStream serial = null;
-		try {
-			fis = new FileInputStream(in);
+		try (FileInputStream fis = new FileInputStream(in); ObjectInputStream serial = new ObjectInputStream(fis)) {
+			while (true) {
+				try {
+					Employee emp = (Employee) serial.readObject();
+					insertPerson(new EmployeeAdapter(emp.fam, emp.name, emp.father, emp.birthday, emp.tab, emp.address,
+							emp.path));
+				} catch (EOFException e) {
+					break;
+				} catch (ClassNotFoundException e) {
+					JOptionPane.showMessageDialog(MainForm.getInstance(), "Неверный формат файла: " + e.getMessage());
+					return;
+				}
+			}
 		} catch (FileNotFoundException e) {
-			if (fis == null) {
-				JOptionPane.showMessageDialog(form, "File cannot be found");
-				return;
-			}
-		}
-		try {
-			serial = new ObjectInputStream(fis);
+			JOptionPane.showMessageDialog(MainForm.getInstance(), "Файл не найден");
+			return;
 		} catch (IOException e) {
-			if (serial == null) {
-				JOptionPane.showMessageDialog(form, "File cannot be open");
-			}
-
-			e.printStackTrace();
-		}
-		while (true) {
-			try {
-				Employee emp = (Employee) serial.readObject();
-				insertPerson(new EmployeeAdapter(emp.fam, emp.name, emp.father, emp.birthday, emp.tab, emp.address,
-						emp.path));
-			} catch (ClassNotFoundException e1) {
-				e1.printStackTrace();
-			} catch (IOException e1) {
-				break;
-			}
-		}
-		try {
-			serial.close();
-			fis.close();
-		} catch (IOException e) {
-			e.printStackTrace();
+			JOptionPane.showMessageDialog(MainForm.getInstance(), "Ошибка чтения: " + e.getMessage());
+			return;
 		}
 		fireDataChange();
 		MainForm.getInstance().expandAll();
 	}
 
 	public void writeFile(File out) {
-		final AdditionalForm form = null;
-		FileOutputStream fos = null;
-		ObjectOutputStream serial = null;
-		try {
-			fos = new FileOutputStream(out);
+		try (FileOutputStream fos = new FileOutputStream(out); ObjectOutputStream serial = new ObjectOutputStream(fos)) {
+			treeWriter(root, serial);
 		} catch (FileNotFoundException e) {
-			{
-				JOptionPane.showMessageDialog(form, "File cannot be found");
-				return;
-			}
-		}
-		try {
-			serial = new ObjectOutputStream(fos);
+			JOptionPane.showMessageDialog(MainForm.getInstance(), "Не удалось создать файл");
 		} catch (IOException e) {
-			if (serial == null) {
-				JOptionPane.showMessageDialog(form, "File cannot be open");
-			}
-		}
-		treeWriter(root, serial);
-		try {
-			serial.flush();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		try {
-			serial.close();
-			fos.close();
-		} catch (IOException e) {
-			e.printStackTrace();
+			JOptionPane.showMessageDialog(MainForm.getInstance(), "Ошибка записи: " + e.getMessage());
 		}
 	}
 
-	public void treeWriter(final DefaultMutableTreeNode node, ObjectOutputStream out) {
-		final AdditionalForm form = null;
+	public void treeWriter(final DefaultMutableTreeNode node, ObjectOutputStream out) throws IOException {
 		if (node.getUserObject() instanceof EmployeeAdapter) {
-			try {
-				out.writeObject(((EmployeeAdapter) node.getUserObject()).getData());
-			} catch (IOException e) {
-				JOptionPane.showMessageDialog(form, "I cannot write");
-			}
-
+			out.writeObject(((EmployeeAdapter) node.getUserObject()).getData());
 			return;
 		}
 		for (int i = 0; i < node.getChildCount(); i++) {

@@ -41,12 +41,25 @@ public class Employee extends DictionaryElem implements Serializable {
 		return fam + " " + name + " " + father;
 	}
 
+	@Override
 	public boolean equals(Object ob) {
-		if (!(ob instanceof Employee))
+		if (!(ob instanceof Employee)) {
 			return false;
+		}
 		Employee o = (Employee) ob;
 		return o.fam.equals(fam) && o.name.equals(name) && o.father.equals(father) && o.birthday.equals(birthday)
 				&& o.tab.equals(tab) && o.address.equals(address);
+	}
+
+	@Override
+	public int hashCode() {
+		int result = fam.hashCode();
+		result = 31 * result + name.hashCode();
+		result = 31 * result + father.hashCode();
+		result = 31 * result + birthday.hashCode();
+		result = 31 * result + tab.hashCode();
+		result = 31 * result + address.hashCode();
+		return result;
 	}
 
 	@Override

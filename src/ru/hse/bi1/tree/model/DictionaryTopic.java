@@ -7,6 +7,22 @@ class DictionaryTopic extends DictionaryElem {
 		theTopic = topic;
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof DictionaryTopic)) {
+			return false;
+		}
+		return theTopic.equals(((DictionaryTopic) o).theTopic);
+	}
+
+	@Override
+	public int hashCode() {
+		return theTopic.hashCode();
+	}
+
 	public String getType() {
 		return "Topic";
 	}

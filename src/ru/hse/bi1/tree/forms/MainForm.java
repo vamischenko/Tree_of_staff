@@ -53,7 +53,7 @@ public class MainForm extends JFrame implements TreeSelectionListener {
 	private JButton searchNextBtn;
 	private static MainForm instance;
 
-	public Searcher seacher = new Searcher();
+	public Searcher searcher = new Searcher();
 
 	private UIManager.LookAndFeelInfo installedLF[];
 
@@ -124,7 +124,7 @@ public class MainForm extends JFrame implements TreeSelectionListener {
 		setJMenuBar(menu);
 
 		Box searchPanel = Box.createHorizontalBox();
-		searchPanel.add(new JLabel("Поиск:  "));
+		searchPanel.add(new JLabel("РџРѕРёСЃРє:  "));
 		searchF = new JTextField();
 		searchPanel.add(searchF);
 		String items[] = { "By last name", "By name", "By father name", "By birthday", "By address",
@@ -165,7 +165,6 @@ public class MainForm extends JFrame implements TreeSelectionListener {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				System.runFinalization();
 				System.exit(0);
 			}
 		});
@@ -176,11 +175,11 @@ public class MainForm extends JFrame implements TreeSelectionListener {
 			public void actionPerformed(ActionEvent e) {
 				Employee entry = new EmployeeAdapter();
 				TreePath path = model.insertPerson(entry);
+				MainForm.getInstance().getModel().fireDataChange();
 				if (path != null) {
 					theTree.scrollPathToVisible(path);
+					theTree.setSelectionPath(path);
 				}
-				MainForm.getInstance().getModel().fireDataChange();
-				theTree.setSelectionPath(path);
 			}
 		});
 
@@ -196,10 +195,14 @@ public class MainForm extends JFrame implements TreeSelectionListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) theTree.getLastSelectedPathComponent();
-				if (selectedNode != null && selectedNode.getParent() != null)
+				if (selectedNode != null && selectedNode.getParent() != null) {
 					model.deletePerson(selectedNode);
-				if (curView != null)
+					model.fireDataChange();
+				}
+				if (curView != null) {
 					panel.remove(curView);
+					curView = null;
+				}
 				form.revalidate();
 			}
 		});
@@ -234,7 +237,7 @@ public class MainForm extends JFrame implements TreeSelectionListener {
 				default:
 					entry = null;
 				}
-				TreePath path = seacher.findNext(entry);
+				TreePath path = searcher.findNext(entry);
 				if (path != null) {
 					theTree.setSelectionPath(path);
 					theTree.expandPath(path);

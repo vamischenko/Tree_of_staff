@@ -38,8 +38,7 @@ public class AdditionalForm extends JPanel {
 	public AdditionalForm(String fam, String name, String father, Date birthday, String tab, String address,
 			String path) {
 		editButton = new JButton("Save");
-		setLayout(new MigLayout("", "3[fill]5[fill,grow]3", "5[]3[]3[]3[]3[]3[]3[]3[]3[]10[]15[]5"));
-		//
+		setLayout(new MigLayout("", "3[fill]5[fill,grow]3", "5[]3[]3[]3[]3[]3[]3[]3[]10[]15[]5"));
 		this.fam = new JTextField(fam);
 		this.name = new JTextField(name);
 		this.father = new JTextField(father);
@@ -48,32 +47,29 @@ public class AdditionalForm extends JPanel {
 		this.address = new JTextField(address);
 		this.path = new JTextField(path);
 		picture = new PicturePanel();
-		//
-		add(new JLabel("<html>Фамилия<font color=red>*"), "");
+		add(new JLabel("<html>Р¤Р°РјРёР»РёСЏ <font color='red'>*</font>"), "");
 		add(this.fam, "pushx,growx,wrap");
-		add(new JLabel("<html>Имя<font color=red>*"), "");
+		add(new JLabel("<html>РРјСЏ <font color='red'>*</font>"), "");
 		add(this.name, "pushx,growx,wrap");
-		add(new JLabel("<html>Отчество<font color=red>*"), "");
+		add(new JLabel("<html>РћС‚С‡РµСЃС‚РІРѕ <font color='red'>*</font>"), "");
 		add(this.father, "pushx,growx,wrap");
-		add(new JLabel("<html>Дата Рождения<font color=red>*"), "");
+		add(new JLabel("<html>Р”Р°С‚Р° СЂРѕР¶РґРµРЅРёСЏ <font color='red'>*</font>"), "");
 		add(this.birthday, "pushx,growx,wrap");
-		add(new JLabel("<html>Табельный номер<font color=red>**"), "");
+		add(new JLabel("<html>РўР°Р±РµР»СЊРЅС‹Р№ РЅРѕРјРµСЂ <font color='red'>**</font>"), "");
 		add(this.tab, "pushx,growx,wrap");
-		add(new JLabel("<html>Адрес<font color=red>*"), "");
+		add(new JLabel("<html>РђРґСЂРµСЃ <font color='red'>*</font>"), "");
 		add(this.address, "pushx,growx,wrap");
-		add(new JLabel("Путь к фотографии"), "");
+		add(new JLabel("РџСѓС‚СЊ Рє С„РѕС‚РѕРіСЂР°С„РёРё"), "");
 		add(this.path, "pushx,growx,wrap");
-		add(new JLabel("<html><font color=red>*</font>- обязательны к заполнению"), "wrap");
-		add(new JLabel("<html><font color=red>**</font>- 5 цифр"), "wrap");
+		add(new JLabel("<html><font color='red'>*</font> вЂ” РѕР±СЏР·Р°С‚РµР»СЊРЅС‹ Рє Р·Р°РїРѕР»РЅРµРЅРёСЋ"), "wrap");
+		add(new JLabel("<html><font color='red'>**</font> вЂ” 5 С†РёС„СЂ"), "wrap");
 		add(editButton, "span 2, w 150!,al center,wrap");
 		add(picture, "span 2,al center,push,grow");
 
 		try {
 			this.tab.setFormatterFactory(new DefaultFormatterFactory(new MaskFormatter("#####")));
 		} catch (ParseException e) {
-			// пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
-			// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-			e.printStackTrace();
+			throw new IllegalStateException("MaskFormatter #####", e);
 		}
 
 		final AdditionalForm form = this;
@@ -132,9 +128,6 @@ public class AdditionalForm extends JPanel {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-				// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-				// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 				if (form.fam.getText().isEmpty()) {
 					JOptionPane.showMessageDialog(form, "Fam cannot be empty");
 					return;
@@ -221,11 +214,8 @@ public class AdditionalForm extends JPanel {
 	}
 
 	class PicturePanel extends JPanel {
-		/**
-		* 
-		*/
 		private static final long serialVersionUID = 1L;
-		Image img;
+		private Image img;
 
 		public PicturePanel() {
 			init();
@@ -233,44 +223,42 @@ public class AdditionalForm extends JPanel {
 
 				@Override
 				public void componentShown(ComponentEvent e) {
-					// TODO Auto-generated method stub
-
 				}
 
 				@Override
 				public void componentResized(ComponentEvent e) {
 					init();
-
 				}
 
 				@Override
 				public void componentMoved(ComponentEvent e) {
-					// TODO Auto-generated method stub
-
 				}
 
 				@Override
 				public void componentHidden(ComponentEvent e) {
-					// TODO Auto-generated method stub
-
 				}
 			});
 		}
 
 		public void init() {
-
 			Toolkit kit = Toolkit.getDefaultToolkit();
-			if (!getPathVal().isEmpty())
+			if (!getPathVal().isEmpty()) {
 				img = kit.getImage(getPathVal());
-			else
+			} else {
 				img = kit.getImage("default.jpg");
-			if (!(getWidth() == 0 || getHeight() == 0))
+			}
+			if (getWidth() > 0 && getHeight() > 0 && img != null) {
 				img = img.getScaledInstance(getWidth(), getHeight(), Image.SCALE_SMOOTH);
-			this.repaint();
+			}
+			repaint();
 		}
 
-		public void paint(Graphics g) {
-			g.drawImage(img, 0, 0, this);
+		@Override
+		protected void paintComponent(Graphics g) {
+			super.paintComponent(g);
+			if (img != null) {
+				g.drawImage(img, 0, 0, this);
+			}
 		}
 
 	}

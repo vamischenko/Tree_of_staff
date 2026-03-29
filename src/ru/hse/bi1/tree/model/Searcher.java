@@ -29,19 +29,20 @@ public class Searcher {
 		}
 	}
 
+	/**
+	 * Ищет следующую запись, совпадающую по {@link Employee#specialEquals}, начиная с текущей позиции
+	 * и проходя список по кругу.
+	 */
 	public TreePath findNext(Employee emp) {
-		for (int i = pos; i < content.size(); i++) {
+		int n = content.size();
+		if (n == 0) {
+			return null;
+		}
+		for (int step = 0; step < n; step++) {
+			int i = (pos + step) % n;
 			if (emp.specialEquals(content.get(i).getUserObject())) {
-				pos = i + 1;
-				if (pos == content.size())
-					pos = 0;
+				pos = (i + 1) % n;
 				return new TreePath(content.get(i).getPath());
-			}
-			if (i == content.size() - 1) {
-				i = -1;
-			}
-			if (i == pos - 1) {
-				break;
 			}
 		}
 		return null;
